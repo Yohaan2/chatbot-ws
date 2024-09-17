@@ -14,7 +14,10 @@ const start = async () => {
   const client = new Client({
     authStrategy : new LocalAuth({
       clientId: 'bodega'
-    })
+    }),
+    puppeteer: {
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    }
   }); 
 
   client.on(Events.QR_RECEIVED, (qr: string) => {
@@ -38,16 +41,11 @@ const start = async () => {
   })
 
   client.on(Events.READY, () => {
-    // initOpenai()
-    //initAnthropic()
     console.log('Client is ready!')
   })
 
   client.on(Events.MESSAGE_RECEIVED, async (message: Message) => {
-
-    //await handleMessageAtropic(message)
-    // await handleMessageOpenai(message)
-    const result = await handleMessage(message)
+    const result = handleMessage(message)
     if(result) message.reply(result, message.from, { linkPreview: true })
 
   })
