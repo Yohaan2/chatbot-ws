@@ -1,0 +1,6 @@
+.vercel
+node_modules
+.env
+dist
+.wwebjs_cache
+.wwebjs_auth
