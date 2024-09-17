@@ -7,8 +7,11 @@ import { handleMessageOpenai } from './handlers/handleMessageOpenai';
 import { initAnthropic } from './provider/antropic';
 import { handleMessageAtropic } from './handlers/handleMessageAtropic';
 import { handleMessage } from './handlers/handleMessage';
+import express from 'express';
+import { PORT } from './config/envs';
 
-
+const app = express()
+let qrCodeUrl: string
 const start = async () => {
 
   const client = new Client({
@@ -21,14 +24,9 @@ const start = async () => {
   }); 
 
   client.on(Events.QR_RECEIVED, (qr: string) => {
-    qrCode.toString(qr, {
-      type: 'terminal',
-      small: true,
-      margin: 1,
-      scale: 1,
-    }, (err, url) => {
-      if (err) throw err;
-      console.log(url);
+    qrCode.toDataURL(qr, (err, url) => {
+      if (err) throw err
+      qrCodeUrl = url
     })
   })
 
@@ -53,3 +51,23 @@ const start = async () => {
   client.initialize()
 }
 start()
+
+app.get('/qr', (req, res) => {
+  if (qrCodeUrl){
+    return res.send(`
+      <html>
+        <body>
+          <h1>Escanea este código QR con WhatsApp</h1>
+          <img src="${qrCodeUrl}" alt="QR Code" />
+        </body>
+      </html>
+      `
+    )
+  }else {
+    return res.send('<h1>No QR code found</h1>')
+  }
+})
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`)
+})
