@@ -4,3 +4,4 @@ node_modules
 dist
 .wwebjs_cache
 .wwebjs_auth
+mongo
